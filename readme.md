@@ -1,12 +1,17 @@
-# Deploy Laravel with Capistrano 3
+# Deploy Laravel 4 with Capistrano 3
 ## Set up Capistrano
 ```shell
 echo "gem 'capistrano', '~> 3.2.0'" > Gemfile
 bundle install
 cap install
 ```
+After Capistrano is all set up, configure `/config/deploy.rb` and `/config/deploy/development.rb`.
 
-## Deploy
+## Deploy server tips
+* Create a user to deploy with
+* Set apache vhost document root to /current/
+
+## Deploy Instructions
 To deploy the develop branch
 * `bundle exec cap development deploy`
 
