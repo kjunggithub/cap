@@ -1,41 +1,97 @@
-set :scm, :git
-set :repo_url, 'git@github.com:kjunggithub/cap.git'
+# config valid only for Capistrano 3.1
+lock '3.2.1'
 
+set :application, "cap"  # EDIT your app name
 set :branch, :master
+
+set :scm, :git
+set :repo_url,  "git@github.com:kjunggithub/cap.git" # EDIT your git repository
 set :log_level, :debug
-set :ssh_options, {forward_agent: true}
-# ask :branch, proc { `git rev-parse --abbrev-ref HEAD`.chomp }
 
-
-set :format, :pretty
-set :log_level, :debug
-set :pty, true
-
-# set :linked_files, %w{config/database.yml}
-# set :linked_dirs, %w{bin log tmp/pids tmp/cache tmp/sockets vendor/bundle public/system}
-
-# set :default_env, { path: "/opt/ruby/bin:$PATH" }
 set :keep_releases, 5
+
+set :ssh_options, {
+  forward_agent: true
+}
+# set :use_sudo, false
+
+# set :ssh_options, {
+#     keys: %w(~/.ssh/id_rsa)
+# }
+
+namespace :composer do
+
+    desc "Running Composer Self-Update"
+    task :update do
+        on roles(:app), in: :sequence, wait: 5 do
+            execute :composer, "self-update"
+        end
+    end
+
+    desc "Running Composer Install"
+    task :install do
+        on roles(:app), in: :sequence, wait: 5 do
+            within release_path  do
+                execute :composer, "install --no-dev --quiet"
+            end
+        end
+    end
+
+end
+
+namespace :laravel do
+
+    desc "Setup Laravel folder permissions"
+    task :permissions do
+        on roles(:app), in: :sequence, wait: 5 do
+            within release_path  do
+                execute :chmod, "u+x artisan"
+                execute :chmod, "-R 777 app/storage/cache"
+                execute :chmod, "-R 777 app/storage/logs"
+                execute :chmod, "-R 777 app/storage/meta"
+                execute :chmod, "-R 777 app/storage/sessions"
+                execute :chmod, "-R 777 app/storage/views"
+            end
+        end
+    end
+
+    desc "Run Laravel Artisan migrate task."
+    task :migrate do
+        on roles(:app), in: :sequence, wait: 5 do
+            within release_path  do
+                execute :php, "artisan migrate"
+            end
+        end
+    end
+
+    desc "Run Laravel Artisan seed task."
+    task :seed do
+        on roles(:app), in: :sequence, wait: 5 do
+            within release_path  do
+                execute :php, "artisan db:seed"
+            end
+        end
+    end
+
+    desc "Optimize Laravel Class Loader"
+    task :optimize do
+        on roles(:app), in: :sequence, wait: 5 do
+            within release_path  do
+                execute :php, "artisan clear-compiled"
+                execute :php, "artisan optimize"
+            end
+        end
+    end
+
+end
 
 namespace :deploy do
 
-  desc 'Restart application'
-  task :restart do
-    on roles(:app), in: :sequence, wait: 5 do
-      # Your restart mechanism here, for example:
-      # execute :touch, release_path.join('tmp/restart.txt')
-    end
-  end
-
-  after :restart, :clear_cache do
-    on roles(:web), in: :groups, limit: 3, wait: 10 do
-      # Here we can do anything such as:
-      # within release_path do
-      #   execute :rake, 'cache:clear'
-      # end
-    end
-  end
-
-  after :finishing, 'deploy:cleanup'
+    after :published, "composer:update"
+    after :published, "composer:install"
+    after :published, "laravel:permissions"
+    after :published, "laravel:optimize"
+    # after :published, "laravel:migrate"
+    # after :published, "laravel:seed"
 
 end
