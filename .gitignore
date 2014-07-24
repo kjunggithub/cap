@@ -1,2 +1,10 @@
-*.DS_Store
-lib/
+
+/bootstrap/compiled.php
+/vendor
+/lib
+composer.phar
+composer.lock
+.env.*.php
+.env.php
+.DS_Store
+Thumbs.db
