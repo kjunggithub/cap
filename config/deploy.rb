@@ -13,6 +13,7 @@ set :keep_releases, 5
 set :ssh_options, {
   forward_agent: true
 }
+
 # set :use_sudo, false
 
 # set :ssh_options, {
@@ -23,16 +24,16 @@ namespace :composer do
 
     desc "Running Composer Self-Update"
     task :update do
-        on roles(:app), in: :sequence, wait: 5 do
+        on roles(:app), in: :sequence, wait: 3 do
             execute :composer, "self-update"
         end
     end
 
     desc "Running Composer Install"
     task :install do
-        on roles(:app), in: :sequence, wait: 5 do
+        on roles(:app), in: :sequence, wait: 3 do
             within release_path  do
-                execute :composer, "install --no-dev --quiet"
+                execute :composer, "install"
             end
         end
     end
@@ -46,11 +47,12 @@ namespace :laravel do
         on roles(:app), in: :sequence, wait: 5 do
             within release_path  do
                 execute :chmod, "u+x artisan"
-                execute :chmod, "-R 777 app/storage/cache"
-                execute :chmod, "-R 777 app/storage/logs"
-                execute :chmod, "-R 777 app/storage/meta"
-                execute :chmod, "-R 777 app/storage/sessions"
-                execute :chmod, "-R 777 app/storage/views"
+                execute :chmod, "-R 777 app/storage"
+                # execute :chmod, "-R 777 app/storage/cache"
+                # execute :chmod, "-R 777 app/storage/logs"
+                # execute :chmod, "-R 777 app/storage/meta"
+                # execute :chmod, "-R 777 app/storage/sessions"
+                # execute :chmod, "-R 777 app/storage/views"
             end
         end
     end
