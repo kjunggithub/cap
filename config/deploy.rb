@@ -12,6 +12,9 @@ set :log_level, :debug
 
 set :keep_releases, 5
 
+# set :linked_files, %w{readme.md setup.md}
+# set :linked_dirs, %w{web/app/uploads}
+
 set :ssh_options, {
   forward_agent: true
 }
@@ -94,8 +97,8 @@ namespace :environment do
 
 desc "Excecute shell commands"
 
-    task :shell, in: :sequence, wait: 2 do
-        on roles(:app) do
+    task :shell do
+        on roles(:app), in: :sequence, wait: 2 do
             execute "mkdir -p #{shared_path}/logs/"
         end
     end
