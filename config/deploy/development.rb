@@ -1,6 +1,6 @@
 set :stage, :development
 set :branch, ENV['BRANCH'] || :develop
-set :application, 'kevinjung.ca'
+set :application, 'cap.kevinjung.ca'
 set :deploy_to, "/home/kjung/websites/#{fetch(:application)}"
 
 # role :app, %w{deploy@example.com}
