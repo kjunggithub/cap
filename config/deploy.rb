@@ -1,4 +1,4 @@
-# config valid only for Capistrano 3.1
+p# config valid only for Capistrano 3.1
 lock '3.2.1'
 
 set :application, "Cap!"  # EDIT your app name
@@ -6,6 +6,8 @@ set :application, "Cap!"  # EDIT your app name
 set :scm, :git
 set :repo_name, "cap"
 set :repo_url,  "git@github.com:kjunggithub/#{fetch(:repo_name)}.git" # EDIT your git repository
+
+# git daemon --base-path=/Users/kjung/Sites --export-all
 # set :repo_url,  "git://WAN IP:/#{fetch(:repo_name)}" # git daemon port: 9418
 
 set :log_level, :debug
