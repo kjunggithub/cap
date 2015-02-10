@@ -1,8 +1,10 @@
-# Deploy Laravel 4 with Capistrano 3
+# Deploy Laravel 5 with Capistrano 3
+
 ## Set up Capistrano
 ```shell
-echo "gem 'capistrano', '~> 3.2.0'" > Gemfile
+echo "gem 'capistrano', '~> 3.3.0'" > Gemfile
 bundle install
+bundle update
 cap install
 ```
 After Capistrano is all set up, configure `/config/deploy.rb` and `/config/deploy/development.rb`.

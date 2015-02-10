@@ -1,5 +1,5 @@
-p# config valid only for Capistrano 3.1
-lock '3.2.1'
+# config valid only for Capistrano 3.1
+# lock '3.2.1'
 
 set :application, "Cap!"  # EDIT your app name
 
@@ -55,7 +55,7 @@ namespace :laravel do
         on roles(:app), in: :sequence, wait: 2 do
             within release_path  do
                 execute :chmod, "u+x artisan"
-                execute :chmod, "-R 777 app/storage"
+                execute :chmod, "-R 777 storage"
                 # execute :chmod, "-R 777 app/storage/cache"
                 # execute :chmod, "-R 777 app/storage/logs"
                 # execute :chmod, "-R 777 app/storage/meta"
