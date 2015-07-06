@@ -1,5 +1,5 @@
 set :scm, :git
-set :application, "blog"
+set :application, "cap"
 set :repo_url,  "git@github.com:kjunggithub/cap.git"
 set :log_level, :debug
 set :keep_releases, 5
@@ -40,7 +40,7 @@ namespace :laravel do
         on roles(:app), in: :sequence, wait: 2 do
             within release_path  do
                 execute :chmod, "u+x artisan"
-                execute :chmod, "-R 777 app/storage"
+                execute :chmod, "-R 777 /storage"
             end
         end
     end
