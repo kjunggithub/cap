@@ -1,37 +1,24 @@
-# config valid only for Capistrano 3.1
-# lock '3.2.1'
-
-set :application, "Cap!"  # EDIT your app name
-
 set :scm, :git
-set :repo_name, "cap"
-set :repo_url,  "git@github.com:kjunggithub/#{fetch(:repo_name)}.git" # EDIT your git repository
+set :application, "blog"
+set :repo_url,  "git@gitlab.com:kjunggitlab/blog.git"
+set :log_level, :debug
+set :keep_releases, 5
+set :ssh_options, { forward_agent: true }
+
+set :linked_files, %w{.env}
+set :linked_dirs, %w{app/storage}
 
 # git daemon --base-path=/Users/kjung/Sites --export-all
 # set :repo_url,  "git://WAN IP:/#{fetch(:repo_name)}" # git daemon port: 9418
 
-set :log_level, :debug
-
-set :keep_releases, 5
-
-# set :linked_files, %w{readme.md setup.md}
-# set :linked_dirs, %w{web/app/uploads}
-
-set :ssh_options, {
-  forward_agent: true
-}
-
 # set :use_sudo, false
-
-# set :ssh_options, {
-#     keys: %w(~/.ssh/id_rsa)
-# }
+# set :ssh_options, {keys: %w(~/.ssh/id_rsa)}
 
 # tasks
 namespace :composer do
 
     desc "Running Composer Self-Update"
-    task :update do
+    task :selfupdate do
         on roles(:app), in: :sequence, wait: 2 do
             execute :composer, "self-update"
         end
@@ -55,12 +42,7 @@ namespace :laravel do
         on roles(:app), in: :sequence, wait: 2 do
             within release_path  do
                 execute :chmod, "u+x artisan"
-                execute :chmod, "-R 777 storage"
-                # execute :chmod, "-R 777 app/storage/cache"
-                # execute :chmod, "-R 777 app/storage/logs"
-                # execute :chmod, "-R 777 app/storage/meta"
-                # execute :chmod, "-R 777 app/storage/sessions"
-                # execute :chmod, "-R 777 app/storage/views"
+                execute :chmod, "-R 777 app/storage"
             end
         end
     end
@@ -72,6 +54,22 @@ namespace :laravel do
                 execute :php, "artisan migrate"
             end
         end
+    end
+
+    desc "Set up Laravel storage folders."
+    task :create_storage do
+    required_directories = [
+          "#{shared_path}/app/storage/cache",
+          "#{shared_path}/app/storage/logs",
+          "#{shared_path}/app/storage/meta",
+          "#{shared_path}/app/storage/sessions",
+          "#{shared_path}/app/storage/views",
+      ]
+      on roles(:web) do
+        required_directories.each do |directory|
+          execute "if test ! -d #{directory}; then mkdir -m 777 -p #{directory} 1>&2; true; fi"
+        end
+      end
     end
 
     desc "Run Laravel Artisan seed task."
@@ -96,25 +94,20 @@ namespace :laravel do
 end
 
 namespace :environment do
-
-desc "Excecute shell commands"
-
-    task :shell do
-        on roles(:app), in: :sequence, wait: 2 do
-            execute "mkdir -p #{shared_path}/logs/"
-        end
+    desc "Restart webserver and php after deploying."
+    task :restart do
+      on roles(:web) do
+        # execute "sudo service php5-fpm restart"
+        execute "sudo service apache2 restart"
+      end
     end
-
 end
 
 namespace :deploy do
-
-    after :published, "composer:update"
+    after :published, "composer:selfupdate"
     after :published, "composer:install"
+    after :published, "laravel:create_storage"
     after :published, "laravel:permissions"
     after :published, "laravel:optimize"
-    # after :published, "laravel:migrate"
-    # after :published, "laravel:seed"
-    # after :published, "environment:shell"
-
+    after :published, "environment:restart"
 end
