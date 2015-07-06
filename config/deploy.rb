@@ -1,6 +1,6 @@
 set :scm, :git
 set :application, "blog"
-set :repo_url,  "git@gitlab.com:kjunggitlab/blog.git"
+set :repo_url,  "git@github.com:kjunggithub/cap.git"
 set :log_level, :debug
 set :keep_releases, 5
 set :ssh_options, { forward_agent: true }
@@ -16,7 +16,6 @@ set :linked_dirs, %w{app/storage}
 
 # tasks
 namespace :composer do
-
     desc "Running Composer Self-Update"
     task :selfupdate do
         on roles(:app), in: :sequence, wait: 2 do
@@ -36,7 +35,6 @@ namespace :composer do
 end
 
 namespace :laravel do
-
     desc "Setup Laravel folder permissions"
     task :permissions do
         on roles(:app), in: :sequence, wait: 2 do
