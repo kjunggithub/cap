@@ -13,6 +13,11 @@ set :linked_dirs, %w{app/storage}
 
 # set :use_sudo, false
 # set :ssh_options, {keys: %w(~/.ssh/id_rsa)}
+# git daemon --base-path=/Users/kjung/Sites --export-all
+# set :repo_url,  "git://WAN IP:/#{fetch(:repo_name)}" # git daemon port: 9418
+
+# set :use_sudo, false
+# set :ssh_options, {keys: %w(~/.ssh/id_rsa)}
 
 # tasks
 namespace :composer do
@@ -35,16 +40,6 @@ namespace :composer do
 end
 
 namespace :laravel do
-    desc "Setup Laravel folder permissions"
-    task :permissions do
-        on roles(:app), in: :sequence, wait: 2 do
-            within release_path  do
-                execute :chmod, "u+x artisan"
-                execute :chmod, "-R 777 /storage"
-            end
-        end
-    end
-
     desc "Run Laravel Artisan migrate task."
     task :migrate do
         on roles(:app), in: :sequence, wait: 2 do
@@ -70,6 +65,18 @@ namespace :laravel do
       end
     end
 
+    desc "Setup Laravel folder permissions"
+    task :permissions do
+        on roles(:app), in: :sequence, wait: 2 do
+            within release_path  do
+                execute :chmod, "u+x artisan"
+                execute :chmod, "-R 777 app/storage"
+                execute :chmod, "-R 777 storage"
+                execute :chmod, "-R 777 bootstrap/cache"
+            end
+        end
+    end
+
     desc "Run Laravel Artisan seed task."
     task :seed do
         on roles(:app), in: :sequence, wait: 2 do
@@ -83,6 +90,7 @@ namespace :laravel do
     task :optimize do
         on roles(:app), in: :sequence, wait: 2 do
             within release_path  do
+                execute :php, "artisan cache:clear"
                 execute :php, "artisan clear-compiled"
                 execute :php, "artisan optimize"
             end
@@ -94,7 +102,7 @@ end
 namespace :environment do
     desc "Restart webserver and php after deploying."
     task :restart do
-      on roles(:web) do
+        on roles(:app), in: :sequence, wait: 2 do
         # execute "sudo service php5-fpm restart"
         execute "sudo service apache2 restart"
       end
