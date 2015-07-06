@@ -57,11 +57,11 @@ namespace :laravel do
     desc "Set up Laravel storage folders."
     task :create_storage do
     required_directories = [
-          "#{shared_path}/app/storage/cache",
-          "#{shared_path}/app/storage/logs",
-          "#{shared_path}/app/storage/meta",
-          "#{shared_path}/app/storage/sessions",
-          "#{shared_path}/app/storage/views",
+          "#{shared_path}/storage/framework/cache",
+          "#{shared_path}/storage/framework/meta",
+          "#{shared_path}/storage/framework/sessions",
+          "#{shared_path}/storage/framework/views",
+          "#{shared_path}/storage/logs",
       ]
       on roles(:web) do
         required_directories.each do |directory|
