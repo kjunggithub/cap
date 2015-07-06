@@ -10,8 +10,8 @@ After Capistrano is all set up, configure `/config/deploy.rb` and `/config/deplo
 
 ## Deploy server tips
 * Create a user to deploy with
-* Set apache vhost document root to `/current/`
-* Upload `.env` file to `/shared/` and use `:linked_files` and `:linked_dirs` to symlink the app files
+* Set apache vhost document root to `/current`
+* Upload `.env` file to `/shared` and use `:linked_files` and `:linked_dirs` to symlink the app files
 * Don't forget to run `php artisan key:generate`
 
 ## Deploy Instructions
